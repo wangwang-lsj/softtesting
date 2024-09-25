@@ -1,0 +1,214 @@
+
+--2查询
+select * from all_users;
+
+select * from emp;
+
+select * from user_tables;
+
+select * from salgrade;
+
+select * from emp where comm is not null;
+
+select * from emp where mgr is null;
+
+select e.ename from emp e;
+
+select distinct(deptno) from emp;
+
+select ename,sal from emp order by sal desc;
+
+select ename, comm from emp order by comm nulls first;
+
+select ename from emp where ename like 'S____';
+
+select ename from emp where ename like 'S%';
+
+select emp.*,emp.sal + 500 as 涨薪后 from emp;
+
+select * from emp where deptno !=10;
+
+select * from emp where deptno = 10 or deptno = 20;
+
+select * from emp where not(deptno = 10 or deptno = 20);
+
+select * from emp where deptno not in (10,20);
+
+select * from emp where sal between 1000 and 2000;
+
+--2.2函数
+select lower(ename) from emp;
+
+select * from dual;
+
+select upper('aaaa') from dual;
+
+select initcap(lower(ename)) from emp;
+
+select concat('Dear:',ename) from emp;
+
+select 'Dear:' || ename from emp;
+
+select ename,substr(ename,3,3) from emp;
+
+--????
+select ename,instr(ename,'I',10) from emp;
+
+select instr('Hello world!', 'wo') from dual;
+
+select ename,length(ename) from emp;
+
+--?????
+select ename,length2(ename),length4(ename),lengthb(ename),lengthc(ename) from emp;
+
+select ename from emp where length(ename) = 5;
+
+select lpad(ename,10,'*') from emp; 
+
+select rpad(ename,10,'*') from emp;
+
+select trim('*' from rpad(ename,10,'*')) from emp;
+
+select replace(concat('Dear ',ename),'Dear ','?') from emp;
+
+select round(123.456) from dual;
+
+select trunc(123.456) from dual;
+
+select mod(100,3) from dual;
+
+select ceil(123.456),floor(123.456) from dual;
+
+select sysdate,systimestamp from dual;
+
+select sysdate,current_date,current_timestamp,localtimestamp from dual;
+
+select hiredate,add_months(hiredate,2) from emp;
+
+--没有
+select hiredate,add_years(hiredate,10) from emp;
+
+select hiredate,last_day(hiredate) from emp;
+
+select extract(year from hiredate) from emp;
+select extract(month from hiredate) from emp;
+select extract(day from hiredate) from emp;
+select extract(hour from systimestamp) from emp;
+select extract(minute from systimestamp) from emp;
+select extract(second from systimestamp) from emp;
+
+select ceil(months_between(sysdate,hiredate)) months from emp;
+
+select next_day(sysdate,'星期五') from dual;
+
+select to_date('2024-09-25','yyyy-mm-dd') from dual;
+
+select to_char(sysdate,'yyyy') from dual;
+select to_char(sysdate,'mm') from dual;
+select to_char(sysdate,'dd') from dual;
+select to_char(sysdate,'day') from dual;
+
+select to_number('123456') from dual;
+--????
+select to_number('1f','xxx') from dual;
+
+--通用函数？？？
+select nvl(comm,500) from emp;
+
+select emp.*,
+case when deptno = 10 then '研发部'
+     when deptno = 20 then '财务部'
+     when deptno = 30 then '销售部'
+     else '其它部门'
+     end 部门
+from emp;
+
+select emp.*,
+decode(deptno,10,'研发部',20,'财务部',30,'销售部','其它部门') 部门
+from emp;
+
+select max(sal),min(sal),avg(sal),count(sal),sum(sal) from emp;
+
+select deptno,round(avg(sal)) from emp group by deptno order by deptno;
+
+select deptno,job,sum(sal) from emp group by deptno,job having sum(sal)>3000;
+
+
+--3连续查询
+select ename from emp where ename = 'SMITH';
+
+select ename,deptno from emp where ename = 'SMITH';
+
+select * from dept where deptno = 20;
+
+--笛卡尔积拼接两张表
+select * from emp,dept;
+
+select emp.ename,emp.deptno,dept.* from emp,dept order by ename;
+
+--非等值连接查询？？？？
+
+--自连接 !!!!!
+select d1.*,d2.* from dept d1,dept d2;
+
+select e1.*,e2.* from emp e1,emp e2;
+
+select e1.deptno,e1.ename,e1.sal,e2.deptno,e2.ename,e2.sal from emp e1,emp e2 
+where e1.deptno = e2.deptno order by e1.ename;
+
+select e1.deptno,e1.ename,e1.sal,ceil(avg(e2.sal)) from emp e1,emp e2 
+where e1.deptno = e2.deptno
+group by e1.deptno,e1.ename,e1.sal
+having e1.sal > avg(e2.sal)
+order by e1.deptno;
+
+--左右内连接
+select * from sc;
+select * from student;
+select * from course;
+select * from teacher;
+
+select * from student s left join sc on sc.sno = s.sno order by s.sno;
+
+select * from sc right join student s on sc.sno = s.sno order by s.sno;
+
+select * from student s join sc on sc.sno = s.sno order by s.sno;
+
+--4.高级查询、开窗函数、分页查询、TOPN查询
+select dbms_random.value() from dual;
+select dbms_random.value(1,11) from dual;
+select trunc(dbms_random.value(1,11),0) from dual;
+select chr(trunc(dbms_random.value(97,123),0)) from dual;
+select * from student order by dbms_random.value();
+
+--子查询
+select max(sal) from emp;
+select ename,sal from emp where sal = (select max(sal) from emp);
+select age from student where sno = 's005';
+select sname,age from student where age > (select age from student where sno = 's005');
+
+--in
+select sno from student where sex = '男';
+select sno,score from sc where sc.sno in (select sno from student where sex = '男');
+
+--any
+select * from student;
+select min(age) from student;
+select * from student where age <= (select min(age) from student);
+
+--all
+select * from student;
+select max(age) from student;
+select * from student where age >= (select max(age) from student);
+
+--4.3开窗函数？？？？？
+
+
+--4.4分页查询？？？？？
+
+
+--5事务、视图、数据类型、约束
+
+--6索引、序列、PLSQL
+--7函数、用户命令、游标、存储过程
+--8数据字典、数据库设计、触发器、in和existi
